@@ -427,7 +427,7 @@ function startTopic(key, customQuestions) {
     topicKey = key;
     originalTopic = topicArr;
     questions = shuffle(topicArr).slice(0, Math.min(10, topicArr.length));
-    wrongQuestions = [];
+    wrongQuestions = []; // Ensure mistakes are cleared at the start
     currentQuestion = 0;
     score = 0;
     showSelect(false);
@@ -504,11 +504,17 @@ function loadQuestion() {
         optionsContainer.innerHTML = "";
         resultElement.innerHTML = "Score: " + score + " out of " + questions.length + '.<br> <br> Total: ' + parseInt(score * 10 / questions.length) + ' sobre 10.';
 
-        // Review mistakes button
-        const reviewButton = document.createElement("button");
-        reviewButton.textContent = "Review mistakes";
-        optionsContainer.appendChild(reviewButton);
-        reviewButton.addEventListener("click", () => startTopic(topicKey, wrongQuestions));
+        // Only show review mistakes button if there are mistakes
+        if (wrongQuestions.length > 0) {
+            const reviewButton = document.createElement("button");
+            reviewButton.textContent = "Review mistakes";
+            optionsContainer.appendChild(reviewButton);
+            reviewButton.addEventListener("click", () => {
+                // Limit review round to max 10 questions
+                const reviewSet = shuffle(wrongQuestions).slice(0, Math.min(10, wrongQuestions.length));
+                startTopic(null, reviewSet);
+            });
+        }
 
         // New round button
         const newRoundButton = document.createElement("button");
@@ -534,8 +540,12 @@ function checkInputAnswer(inputValue, correctAnswers, optionsContainer, inputEle
             loadQuestion();
         }, 1500);
     } else {
+        const q = questions[currentQuestion];
+        if (!wrongQuestions.includes(q)) {
+            wrongQuestions.push(q);
+        }
         setResult("Try with: " + correctAnswers.join(", "), "orange");
-        wrongQuestions.push(questions[currentQuestion]);
+        // Only add mistake if not already present
 
         // Remove previous input/button
         if (inputElem && submitBtn) {
