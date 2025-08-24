@@ -812,6 +812,3 @@ window.theme_is = function(chosen) {
 // Open/close select menu
 window.openSelect = function() { showSelect(true); };
 window.closeSelect = function() { showSelect(false); };
-// Open/close select menu
-window.openSelect = function() { showSelect(true); };
-window.closeSelect = function() { showSelect(false); };
